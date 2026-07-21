@@ -10,6 +10,63 @@ This repository covers:
 - **Step 3 – Model Training and Evaluation** (`train_models.py`)
 - **Step 4 – Model Evaluation, Fairness & Explainability** (`model_evaluation.py`)
 - **Step 5 – Performance Optimization** (`optimized_pipeline.py`, `optimization_report.md`)
+- **Step 6 – Packaging, Tests & Docs** (`src/retail_pipeline/`, `setup.py`, `tests/`)
+
+---
+
+## 📦 Installable package: `retail_pipeline`
+
+The reusable logic is packaged as an installable library under
+[`src/retail_pipeline/`](src/retail_pipeline/) (a `src`-layout package).
+
+### Package structure
+```
+src/retail_pipeline/
+├── __init__.py          # public API + version
+├── data_loader.py       # data processing: get_spark_session, load_sales_data, RETAIL_SCHEMA
+├── transformations.py   # data processing: add_revenue, remove_invalid_sales, clean_data, cap_outliers_iqr
+├── analysis.py          # analysis: aggregate_sales, top_products, sales_by_country, daily_sales
+└── utils.py             # utilities: configure_spark_home
+tests/                   # pytest suite (6 tests)
+setup.py                 # packaging metadata + dependencies
+```
+
+### Installation
+```bash
+pip install -r requirements.txt
+pip install -e .          # install the retail_pipeline package (editable)
+```
+
+### Usage example
+```python
+from retail_pipeline import (
+    get_spark_session, load_sales_data, clean_data, add_revenue,
+    aggregate_sales, top_products,
+)
+
+spark = get_spark_session("MyRetailApp")
+df = load_sales_data(spark, "data/online_retail.csv")   # -> Spark DataFrame
+clean = add_revenue(clean_data(df))                     # clean + add Revenue
+
+aggregate_sales(clean).show()      # total_sales, total_quantity, num_transactions
+top_products(clean, n=5).show()    # top 5 products by quantity
+```
+
+### Key functions
+| Function | Purpose |
+|----------|---------|
+| `get_spark_session(app_name, master)` | Create a configured SparkSession (fixes `SPARK_HOME`). |
+| `load_sales_data(spark, path, infer_schema=False)` | Load the retail CSV into a DataFrame with an explicit schema. |
+| `clean_data(df, drop_missing_customer=True)` | Drop blank descriptions, missing customers and invalid sales. |
+| `add_revenue(df)` | Add `Revenue = Quantity × UnitPrice`. |
+| `aggregate_sales(df)` | Total sales, total quantity, number of transactions. |
+| `top_products(df, n=5)` | Top *n* products by quantity sold. |
+
+### Running the tests
+```bash
+pip install pytest
+pytest -q          # 6 tests: loading, transformations, aggregations
+```
 
 ---
 

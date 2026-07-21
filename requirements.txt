@@ -6,3 +6,4 @@ joblib
 pyarrow
 shap
 matplotlib
+pytest
