@@ -1,0 +1,3 @@
+segment,n,auc_roc,precision,recall,f1
+International,89,0.8646,0.7617,0.764,0.762
+United Kingdom,772,0.8575,0.7735,0.7785,0.7738

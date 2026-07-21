@@ -3,3 +3,5 @@ pandas
 openpyxl
 scikit-learn
 joblib
+pyarrow
+shap

@@ -8,6 +8,7 @@ This repository covers:
 - **Step 1 – Data Ingestion and Exploration** (`data_ingestion.py`)
 - **Step 2 – Data Cleaning and Feature Engineering** (`data_cleaning.py`, `feature_engineering.py`)
 - **Step 3 – Model Training and Evaluation** (`train_models.py`)
+- **Step 4 – Model Evaluation, Fairness & Explainability** (`model_evaluation.py`)
 
 ---
 
@@ -157,6 +158,51 @@ Runs end-to-end in **under 2 minutes** (the demand model trains on a 10% sample)
 Run:
 ```bash
 python train_models.py
+```
+
+---
+
+## ⚖️ Step 4 — Model Evaluation, Fairness & Explainability (`model_evaluation.py`)
+
+AUC-ROC / precision / recall / F1 are **classification** metrics, so this step
+defines a binary target: **customer churn** (`label = 1` if no purchase in the
+last 90 days). A Spark MLlib `RandomForestClassifier` predicts churn from
+customer behaviour features.
+
+### Classification metrics
+| Metric | Overall |
+|--------|---------|
+| AUC-ROC | 0.859 |
+| Precision | 0.772 |
+| Recall | 0.777 |
+| F1 | 0.773 |
+
+### Bias detection & fairness
+Customers are split into two segments — **United Kingdom** vs **International**
+(country is the only demographic-like attribute in the data) — and the metrics
+are recomputed per segment:
+
+| Segment | n | AUC-ROC | Precision | Recall | F1 |
+|---------|---|---------|-----------|--------|----|
+| United Kingdom | 772 | 0.858 | 0.774 | 0.779 | 0.774 |
+| International   |  89 | 0.865 | 0.762 | 0.764 | 0.762 |
+
+**Max disparity ≈ 0.015** across all metrics → no fairness concern; the model
+performs equitably across segments.
+
+### Explainability (SHAP)
+SHAP explanations are generated for **5 individual predictions**, attributing
+each churn probability to the input features (a scikit-learn surrogate mirrors
+the Spark model, since SHAP has no native Spark-ML support).
+
+### Outputs
+- `evaluation_results.json` — full metrics, per-segment metrics, fairness
+  disparities, and the 5 SHAP explanations.
+- `output/fairness_report.csv` — flat per-segment metric table.
+
+Run:
+```bash
+python model_evaluation.py
 ```
 
 ---
