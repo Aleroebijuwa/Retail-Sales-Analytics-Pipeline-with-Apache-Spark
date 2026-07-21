@@ -96,7 +96,7 @@ All results are written to the `output/` directory:
 
 ### Install dependencies
 ```bash
-pip install pyspark==3.5.3 pandas openpyxl
+pip install -r requirements.txt
 ```
 
 ### Run the script
