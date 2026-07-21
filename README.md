@@ -9,6 +9,7 @@ This repository covers:
 - **Step 2 – Data Cleaning and Feature Engineering** (`data_cleaning.py`, `feature_engineering.py`)
 - **Step 3 – Model Training and Evaluation** (`train_models.py`)
 - **Step 4 – Model Evaluation, Fairness & Explainability** (`model_evaluation.py`)
+- **Step 5 – Performance Optimization** (`optimized_pipeline.py`, `optimization_report.md`)
 
 ---
 
@@ -203,6 +204,34 @@ the Spark model, since SHAP has no native Spark-ML support).
 Run:
 ```bash
 python model_evaluation.py
+```
+
+---
+
+## ⚡ Step 5 — Performance Optimization (`optimized_pipeline.py`)
+
+Runs the same analytics workload **twice** (baseline vs optimized), measures the
+wall-clock time, and captures the Spark UI Stages tab for each.
+
+| Run | Configuration | Time |
+|-----|---------------|------|
+| Before | 200 shuffle partitions, no cache, AQE off | **45.37 s** |
+| After  | 8 partitions, cached DataFrames, AQE on | **10.79 s** |
+
+**➡ 76.2% faster** (well above the 30% target).
+
+**Optimizations:** repartition by `Country` into 8 partitions; cache the two
+reused DataFrames (base + daily sales); tune 3 config parameters
+(`shuffle.partitions` 200→8, `adaptive.enabled` on, `adaptive.coalescePartitions`
+on). Full write-up in [`optimization_report.md`](optimization_report.md).
+
+**Spark UI evidence** (`screenshots/`): the *before* capture shows 15 stages at
+200 tasks each; the *after* capture shows **34 skipped stages** (cache hits) and
+8 tasks per stage.
+
+Run:
+```bash
+python optimized_pipeline.py
 ```
 
 ---
