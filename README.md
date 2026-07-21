@@ -7,6 +7,7 @@ business metrics using both the **DataFrame API** and **Spark SQL**.
 This repository covers:
 - **Step 1 – Data Ingestion and Exploration** (`data_ingestion.py`)
 - **Step 2 – Data Cleaning and Feature Engineering** (`data_cleaning.py`, `feature_engineering.py`)
+- **Step 3 – Model Training and Evaluation** (`train_models.py`)
 
 ---
 
@@ -121,6 +122,41 @@ Run:
 ```bash
 python data_cleaning.py        # clean only (writes data/cleaned_retail.csv)
 python feature_engineering.py  # clean + features + scaling (writes output/ + models/)
+```
+
+---
+
+## 🤖 Step 3 — Model Training & Evaluation (`train_models.py`)
+
+Trains two Spark **MLlib** models on the Step 2 features:
+
+### 1. Linear Regression — sales forecasting
+Predicts **daily total revenue** from calendar features (`day_of_week`, `month`,
+`quarter`, `is_weekend`, `is_holiday`). Evaluated with `RegressionEvaluator`:
+
+| Metric | Value |
+|--------|-------|
+| RMSE   | ~6,258 |
+| R²     | ~0.41  |
+
+### 2. Random Forest — product demand prediction
+Predicts **units sold (Quantity)** per transaction from price + calendar features.
+Tuned with **`TrainValidationSplit`** over a **4-combination** parameter grid
+(`maxDepth ∈ {5,10}` × `numTrees ∈ {20,50}`). Best model: `maxDepth=10, numTrees=50`.
+
+**Feature importances** (extracted from the best model): `UnitPrice` dominates
+(~0.71), followed by `hour` (~0.14) — i.e. price is by far the strongest driver
+of how many units sell.
+
+### Outputs
+- `output/predictions.parquet` — actual vs predicted rows for both models
+  (columns: `model`, `actual`, `predicted`).
+
+Runs end-to-end in **under 2 minutes** (the demand model trains on a 10% sample).
+
+Run:
+```bash
+python train_models.py
 ```
 
 ---

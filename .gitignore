@@ -30,10 +30,11 @@ models/*
 *.xlsx
 *.db
 
-# Raw CSVs are ignored, but computed metrics in output/ ARE tracked
+# Raw CSVs are ignored, but computed metrics/outputs in output/ ARE tracked
 *.csv
 !output/
 !output/*.csv
+!output/*.parquet
 
 # IDE / OS
 .vscode/
