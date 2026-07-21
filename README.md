@@ -4,7 +4,9 @@ An end-to-end learning project that ingests a real retail transaction dataset
 into **Apache Spark (PySpark)**, explores its structure, and computes core
 business metrics using both the **DataFrame API** and **Spark SQL**.
 
-This repository covers **Step 1 – Data Ingestion and Exploration**.
+This repository covers:
+- **Step 1 – Data Ingestion and Exploration** (`data_ingestion.py`)
+- **Step 2 – Data Cleaning and Feature Engineering** (`data_cleaning.py`, `feature_engineering.py`)
 
 ---
 
@@ -84,6 +86,42 @@ All results are written to the `output/` directory:
 | `top_products.csv`       | Top 5 products by quantity, with revenue.                        |
 | `daily_sales.csv`        | Revenue, transactions and units sold per day.                   |
 | `sales_by_country.csv`   | Total revenue per country.                                       |
+
+---
+
+## 🧹 Step 2 — Data Cleaning & Feature Engineering
+
+Two scripts turn the raw transactions into an analysis-ready feature set.
+
+### `data_cleaning.py`
+- **Missing values** (documented strategy per column): drop null `CustomerID`
+  (an identity key — imputation would fabricate customers), drop blank
+  `Description` (non-product adjustment rows), median-impute any null
+  `UnitPrice` (robust to price skew).
+- **Invalid records**: remove cancellations (`InvoiceNo` starting with `C`) and
+  non-positive quantity/price.
+- **Outliers**: detected with the **IQR method** and **capped (winsorized)** to
+  `[Q1 − 1.5·IQR, Q3 + 1.5·IQR]` on `Quantity` and `UnitPrice` — keeps every
+  transaction while limiting extreme influence.
+
+### `feature_engineering.py`
+- **Temporal features (7)**: `day_of_week`, `day_name`, `month`, `quarter`,
+  `year`, `hour`, `is_weekend`, `is_holiday` (UK bank holidays, via a Spark UDF).
+- **Customer behaviour aggregations**: `total_purchases`, `total_quantity`,
+  `total_revenue`, `unique_products`, `days_since_last_purchase` (recency),
+  and `average_transaction_value` (avg revenue per invoice) — an RFM-style table.
+- **Scaling**: all numeric customer features are standardised with a
+  scikit-learn `StandardScaler` **Pipeline**, saved to
+  `models/customer_feature_scaler.joblib` for reuse.
+
+**Step 2 outputs:** `output/customer_features.csv`,
+`output/customer_features_scaled.csv`, and the saved scaler in `models/`.
+
+Run:
+```bash
+python data_cleaning.py        # clean only (writes data/cleaned_retail.csv)
+python feature_engineering.py  # clean + features + scaling (writes output/ + models/)
+```
 
 ---
 

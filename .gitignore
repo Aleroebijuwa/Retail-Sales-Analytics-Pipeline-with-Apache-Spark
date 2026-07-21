@@ -23,6 +23,8 @@ data/*
 !data/.gitkeep
 models/*
 !models/.gitkeep
+# Track the small saved feature-scaling pipeline (evidence of "saved for reuse")
+!models/*.joblib
 *.parquet
 *.tsv
 *.xlsx
