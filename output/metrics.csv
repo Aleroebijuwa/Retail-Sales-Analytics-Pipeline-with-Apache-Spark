@@ -1,0 +1,13 @@
+section,name,value
+summary,total_sales,10666684.54
+summary,average_transaction_value,534.4
+summary,number_of_transactions,19960.0
+summary,total_quantity_sold,5588376.0
+summary,unique_products,3922.0
+summary,unique_customers,4338.0
+summary,total_line_items,541909.0
+top_product_by_quantity,"PAPER CRAFT , LITTLE BIRDIE (23843)",80995.0
+top_product_by_quantity,MEDIUM CERAMIC TOP STORAGE JAR (23166),78033.0
+top_product_by_quantity,WORLD WAR 2 GLIDERS ASSTD DESIGNS (84077),55047.0
+top_product_by_quantity,JUMBO BAG RED RETROSPOT (85099B),48474.0
+top_product_by_quantity,WHITE HANGING HEART T-LIGHT HOLDER (85123A),37599.0

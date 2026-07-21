@@ -24,10 +24,14 @@ data/*
 models/*
 !models/.gitkeep
 *.parquet
-*.csv
 *.tsv
 *.xlsx
 *.db
+
+# Raw CSVs are ignored, but computed metrics in output/ ARE tracked
+*.csv
+!output/
+!output/*.csv
 
 # IDE / OS
 .vscode/
